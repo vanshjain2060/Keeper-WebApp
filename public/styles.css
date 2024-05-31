@@ -102,3 +102,48 @@ form.create-note button {
   cursor: pointer;
   outline: none;
 }
+
+
+/* this is the styles for the update note section */
+
+.updatedNote {
+  background: #fff;
+  border-radius: 7px;
+  box-shadow: 0 2px 5px #ccc;
+  padding: 10px;
+  margin: 16px;
+  width: 240px; 
+
+}
+
+.container {
+  display: flex;
+  gap: 20px;
+  align-items: start;
+}
+
+.updatedNote input[type="text"],
+.updatedNote textarea {
+  width: calc(100% - 20px);
+  padding: 4px;
+  border: none;
+  margin-bottom: 10px; 
+  outline: none;
+  font-size: 1.2em;
+  font-family: "Montserrat", sans-serif;
+  resize: none; 
+}
+
+.updatedNote button {
+  right: 10px; 
+  bottom: 10px;
+  color: #f5ba13;
+  background-color: #fff;
+  border: none;
+  float: right;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  outline: none;
+}
+

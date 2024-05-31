@@ -1,41 +1,77 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Note from "./Note";
 import CreateArea from "./CreateArea";
+import axios from "axios";
 
 function App() {
   const [notes, setNotes] = useState([]);
 
-  function addNote(newNote) {
-    setNotes((prevNotes) => {
-      return [...prevNotes, newNote];
-    });
+  useEffect(() => {
+    const fetchpost = async () => {
+      const response = await axios.get("http://localhost:8000/note");
+      const data = await response.data;
+      setNotes(data);
+    };
+    fetchpost();
+  }, [notes]);
+
+  async function addNote(newNote) {
+    try {
+      console.log("hello");
+      const response = await axios.post("http://localhost:8000/note", {
+        ...newNote,
+      });
+      const data = await response.data;
+      console.log(data);
+      setNotes((prevNotes) => {
+        return [...prevNotes, newNote];
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  function deleteNote(id) {
-    setNotes((prevNotes) => {
-      return prevNotes.filter((note, index) => {
-        return index !== id;
-      });
-    });
+  async function deleteNote(id) {
+    try {
+      const response = await axios.delete(`http://localhost:8000/note/${id}`);
+      setNotes(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function updateNote(id, updatedNote) {
+    try {
+      await axios.patch(`http://localhost:8000/note/${id}`, {...updatedNote});
+      
+      const response = await axios.get("http://localhost:8000/note");
+      setNotes(response.data); 
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
     <div>
       <Header />
       <CreateArea onAdd={addNote} />
+      <div className="container">
+        
       {notes.map((noteItem, index) => {
         return (
           <Note
             key={index}
-            id={index}
+            id={noteItem._id}
             title={noteItem.title}
             content={noteItem.content}
             onDelete={deleteNote}
+            onUpdate={updateNote}
           />
         );
       })}
+      </div>
       <Footer />
     </div>
   );

@@ -10,7 +10,7 @@ function CreateArea(props) {
 
   const [note, setNote] = useState({
     title: "",
-    content: "",
+    content: ""
   });
 
   function handleChange(event) {
