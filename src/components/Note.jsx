@@ -54,10 +54,10 @@ function Note(props) {
         <div className="note">
           <h1>{props.title}</h1>
           <p>{props.content}</p>
-          <button onClick={() => props.onDelete(props.index)}>
+          <button title="Delete" onClick={() => props.onDelete(props.index)}>
             <DeleteIcon />
           </button>
-          <button onClick={handleUpdate}>
+          <button title="Update" onClick={handleUpdate}>
             <UpdateIcon />
           </button>
         </div>

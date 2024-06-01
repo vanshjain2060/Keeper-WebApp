@@ -109,7 +109,10 @@ function App() {
               />
             ))}
           </div>
-          <button onClick={handleLogOut} className="btn">Log out</button>
+          {/* here form is used so that on click of the button it will refresh itself */}
+          <form > 
+          <button onSubmit={handleLogOut} className="btn">Log out</button>
+          </form>
         </>
       ) : (
         <Register onRegister={registerUser}
