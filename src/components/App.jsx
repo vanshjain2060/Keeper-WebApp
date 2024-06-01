@@ -86,6 +86,10 @@ function App() {
     }
   }
 
+  async function handleLogOut() {
+    
+  }
+
   return (
     <div>
       <Header />
@@ -105,6 +109,7 @@ function App() {
               />
             ))}
           </div>
+          <button onClick={handleLogOut} className="btn">Log out</button>
         </>
       ) : (
         <Register onRegister={registerUser}

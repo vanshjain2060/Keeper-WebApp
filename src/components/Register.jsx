@@ -35,7 +35,7 @@ function Register (props) {
 
     return (
     <div>
-    {isregister ? <div className="login-container">
+    {isregister ? (<div className="login-container">
             <form onSubmit={handleRegister} className="login-form">
                 <input 
                     type="text" 
@@ -56,8 +56,8 @@ function Register (props) {
                 <button type="submit">Register</button>
                 
             </form>
-        </div> : <LoginPage onLoginSubmit={props.onLoginSubmit}/>}  
-        <button onClick={handleToggle} className="btn">{isregister ? "Log In" : "register"}</button>
+        </div>) : (<LoginPage onLoginSubmit={props.onLoginSubmit}/>)}  
+        <button onClick={handleToggle} className="btn">{isregister ? "Log In" : "Register"}</button>
 
     </div>
     )
