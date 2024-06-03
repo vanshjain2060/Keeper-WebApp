@@ -12,6 +12,14 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId ,setuserId] = useState("")
 
+  const axiosInstance = axios.create({
+    baseURL: 'https://keeper-webapp-server-1.onrender.com',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    withCredentials: true // Optional: Only needed if your backend requires credentials
+  });
 
   useEffect(() => {
     // Fetch notes if user is logged in
@@ -31,7 +39,7 @@ function App() {
 
   async function registerUser(userDetail) {
     try {
-      const response = await axios.post(`http://localhost:8000/register`, userDetail);
+      const response = await axiosInstance.post(`https://keeper-webapp-server-1.onrender.com/register`, userDetail);
       console.log(response.data);
       const id = response.data; // response contains the userId
       setuserId(id);
