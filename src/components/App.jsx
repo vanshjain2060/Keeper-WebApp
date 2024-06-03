@@ -3,29 +3,19 @@ import Header from "./Header";
 import Footer from "./Footer";
 import Note from "./Note";
 import CreateArea from "./CreateArea";
-import LoginPage from "./LoginPage";
 import Register from "./Register";
 import axios from "axios";
 
 function App() {
   const [notes, setNotes] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId ,setuserId] = useState("")
-
-  const axiosInstance = axios.create({
-    baseURL: 'https://keeper-webapp-server-1.onrender.com',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    withCredentials: true // Optional: Only needed if your backend requires credentials
-  });
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
     // Fetch notes if user is logged in
     const fetchNotes = async () => {
       try {
-        const notesResponse = await axios.get(`http://localhost:8000/user/${userId}/note`);
+        const notesResponse = await axios.get(`/user/${userId}/note`);
         setNotes(notesResponse.data);
       } catch (error) {
         console.error("Error fetching notes:", error);
@@ -39,35 +29,29 @@ function App() {
 
   async function registerUser(userDetail) {
     try {
-      const response = await axiosInstance.post(`https://keeper-webapp-server-1.onrender.com/register`, userDetail);
-      console.log(response.data);
+      const response = await axios.post(`/register`, userDetail);
       const id = response.data; // response contains the userId
-      setuserId(id);
+      setUserId(id);
       setIsLoggedIn(id);
-      // if(!isLoggedIn) console.log("Invalid Password, UserName Already exist... ");
-      // else console.log("You're Now Logged In");
     } catch (error) {
       console.error("Error registering user:", error);
     }
   }
 
- async function loginUser(loginDetail) {
-  try {
-    const response = await axios.post(`http://localhost:8000/login`, loginDetail);
-    console.log(response.data);
-    const id = response.data; 
-    setuserId(id);
-    setIsLoggedIn(id);
-    // if(!isLoggedIn) console.log("Invalid User Name or Password");
-    // else console.log("You're Now Logged In");
-  } catch (error) {
-    console.error("Error logging in:", error);
+  async function loginUser(loginDetail) {
+    try {
+      const response = await axios.post(`/login`, loginDetail);
+      const id = response.data;
+      setUserId(id);
+      setIsLoggedIn(id);
+    } catch (error) {
+      console.error("Error logging in:", error);
+    }
   }
-}
 
   async function addNote(newNote) {
     try {
-      const response = await axios.post(`http://localhost:8000/user/${userId}/note`, newNote);
+      const response = await axios.post(`/user/${userId}/note`, newNote);
       setNotes(response.data);
     } catch (error) {
       console.error("Error adding note:", error);
@@ -75,10 +59,8 @@ function App() {
   }
 
   async function deleteNote(noteId) {
-    console.log(userId);
-    console.log(noteId);
     try {
-      const response = await axios.delete(`http://localhost:8000/user/${userId}/note/${noteId}`);
+      const response = await axios.delete(`/user/${userId}/note/${noteId}`);
       setNotes(response.data);
     } catch (error) {
       console.error("Error deleting note:", error);
@@ -87,15 +69,17 @@ function App() {
 
   async function updateNote(noteId, updatedNote) {
     try {
-      const response = await axios.patch(`http://localhost:8000/user/${userId}/note/${noteId}`, updatedNote);
+      const response = await axios.patch(`/user/${userId}/note/${noteId}`, updatedNote);
       setNotes(response.data);
     } catch (error) {
       console.error("Error updating note:", error);
     }
   }
 
-  async function handleLogOut() {
-    
+  function handleLogOut() {
+    setIsLoggedIn(false);
+    setUserId("");
+    setNotes([]);
   }
 
   return (
@@ -117,13 +101,13 @@ function App() {
               />
             ))}
           </div>
-          {/* here form is used so that on click of the button it will refresh itself */}
-          <form > 
-          <button onSubmit={handleLogOut} className="btn">Log out</button>
+          <form onSubmit={handleLogOut}>
+            <button className="btn">Log out</button>
           </form>
         </>
       ) : (
-        <Register onRegister={registerUser}
+        <Register
+          onRegister={registerUser}
           onLoginSubmit={loginUser}
         />
       )}
