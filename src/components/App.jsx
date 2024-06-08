@@ -1,95 +1,103 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Header from "./Header";
 import Footer from "./Footer";
 import Note from "./Note";
 import CreateArea from "./CreateArea";
-import LoginPage from "./LoginPage";
 import Register from "./Register";
-import axios from "axios";
+import LoginPage from "./LoginPage";
 
 function App() {
   const [notes, setNotes] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId ,setuserId] = useState("")
-
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
-    // Fetch notes if user is logged in
-    const fetchNotes = async () => {
+    const checkLoggedInStatus = async () => {
       try {
-        const notesResponse = await axios.get(`http://localhost:8000/user/${userId}/note`);
-        setNotes(notesResponse.data);
+        const response = await axios.get("http://localhost:8000/checkLoggedIn", { withCredentials: true });
+        if (response.data.isLoggedIn) {
+          setIsLoggedIn(true);
+          setUserId(response.data.userId);
+          fetchNotes(response.data.userId);
+        }
       } catch (error) {
-        console.error("Error fetching notes:", error);
+        console.error("Error checking login status:", error);
       }
     };
 
-    if (isLoggedIn) {
-      fetchNotes();
-    }
-  }, [isLoggedIn, userId]);
+    checkLoggedInStatus();
+  }, []);
 
-  async function registerUser(userDetail) {
+  const fetchNotes = async (userId) => {
     try {
-      const response = await axios.post(`http://localhost:8000/register`, userDetail);
-      const id = response.data; // response contains the userId
-      setuserId(id);
-      setIsLoggedIn(id);
+      const notesResponse = await axios.get(`http://localhost:8000/user/${userId}/note`, { withCredentials: true });
+      setNotes(notesResponse.data);
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+    }
+  };
+
+  const registerUser = async (userDetail) => {
+    try {
+      const response = await axios.post(`http://localhost:8000/register`, userDetail, { withCredentials: true });
+      setUserId(response.data.userId);
+      setIsLoggedIn(true);
+      fetchNotes(response.data.userId);
     } catch (error) {
       console.error("Error registering user:", error);
     }
-  }
+  };
 
- async function loginUser(loginDetail) {
-  try {
-    const response = await axios.post(`http://localhost:8000/login`, loginDetail);
-    const id = response.data; 
-    setuserId(id);
-    setIsLoggedIn(id);
-  } catch (error) {
-    console.error("Error logging in:", error);
-  }
-}
-
-  async function addNote(newNote) {
+  const loginUser = async (loginDetail) => {
     try {
-      const response = await axios.post(`http://localhost:8000/user/${userId}/note`, newNote);
+      const response = await axios.post(`http://localhost:8000/login`, loginDetail, { withCredentials: true });
+      setUserId(response.data.userId);
+      setIsLoggedIn(true);
+      fetchNotes(response.data.userId);
+    } catch (error) {
+      console.error("Error logging in:", error);
+    }
+  };
+
+  const addNote = async (newNote) => {
+    try {
+      const response = await axios.post(`http://localhost:8000/user/${userId}/note`, newNote, { withCredentials: true });
       setNotes(response.data);
     } catch (error) {
       console.error("Error adding note:", error);
     }
-  }
+  };
 
-  async function deleteNote(noteId) {
-    console.log(userId);
-    console.log(noteId);
+  const deleteNote = async (noteId) => {
     try {
-      const response = await axios.delete(`http://localhost:8000/user/${userId}/note/${noteId}`);
-      setNotes(response.data);
+      await axios.delete(`http://localhost:8000/user/${userId}/note/${noteId}`, { withCredentials: true });
+      const updatedNotes = notes.filter((note) => note._id !== noteId);
+      setNotes(updatedNotes);
     } catch (error) {
       console.error("Error deleting note:", error);
     }
-  }
+  };
 
-  async function updateNote(noteId, updatedNote) {
+  const updateNote = async (noteId, updatedNote) => {
     try {
-      const response = await axios.patch(`http://localhost:8000/user/${userId}/note/${noteId}`, updatedNote);
+      const response = await axios.patch(`http://localhost:8000/user/${userId}/note/${noteId}`, updatedNote, { withCredentials: true });
       setNotes(response.data);
     } catch (error) {
       console.error("Error updating note:", error);
     }
-  }
+  };
 
-  async function handleLogOut() {
+  const handleLogout = async () => {
     try {
-        const response = await axios.post("http://localhost:8000/logout");
-        const id = response.data; 
-        setuserId(id);
-        setIsLoggedIn(id);
+      await axios.post("http://localhost:8000/logout", {}, { withCredentials: true });
+      setIsLoggedIn(false);
+      setUserId("");
+      setNotes([]);
     } catch (error) {
-        console.error("Error: ", error);
+      console.error("Error logging out:", error);
     }
-  }
+  };
 
   return (
     <div>
@@ -101,7 +109,6 @@ function App() {
             {notes.map((noteItem, index) => (
               <Note
                 key={index}
-                index={index}
                 id={noteItem._id}
                 title={noteItem.title}
                 content={noteItem.content}
@@ -110,12 +117,10 @@ function App() {
               />
             ))}
           </div>
-          <button onClick={handleLogOut} className="btn">Log out</button>          
+          <button onClick={handleLogout} className="btn">Log out</button>
         </>
       ) : (
-        <Register onRegister={registerUser}
-          onLoginSubmit={loginUser}
-        />
+        <Register onRegister={registerUser} onLoginSubmit={loginUser} />
       )}
       <Footer />
     </div>
