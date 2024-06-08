@@ -32,12 +32,9 @@ function App() {
   async function registerUser(userDetail) {
     try {
       const response = await axios.post(`http://localhost:8000/register`, userDetail);
-      console.log(response.data);
       const id = response.data; // response contains the userId
       setuserId(id);
       setIsLoggedIn(id);
-      // if(!isLoggedIn) console.log("Invalid Password, UserName Already exist... ");
-      // else console.log("You're Now Logged In");
     } catch (error) {
       console.error("Error registering user:", error);
     }
@@ -46,12 +43,9 @@ function App() {
  async function loginUser(loginDetail) {
   try {
     const response = await axios.post(`http://localhost:8000/login`, loginDetail);
-    console.log(response.data);
     const id = response.data; 
     setuserId(id);
     setIsLoggedIn(id);
-    // if(!isLoggedIn) console.log("Invalid User Name or Password");
-    // else console.log("You're Now Logged In");
   } catch (error) {
     console.error("Error logging in:", error);
   }
@@ -87,7 +81,14 @@ function App() {
   }
 
   async function handleLogOut() {
-    
+    try {
+        const response = await axios.post("http://localhost:8000/logout");
+        const id = response.data; 
+        setuserId(id);
+        setIsLoggedIn(id);
+    } catch (error) {
+        console.error("Error: ", error);
+    }
   }
 
   return (
@@ -109,10 +110,7 @@ function App() {
               />
             ))}
           </div>
-          {/* here form is used so that on click of the button it will refresh itself */}
-          <form > 
-          <button onSubmit={handleLogOut} className="btn">Log out</button>
-          </form>
+          <button onClick={handleLogOut} className="btn">Log out</button>          
         </>
       ) : (
         <Register onRegister={registerUser}
