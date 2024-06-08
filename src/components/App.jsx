@@ -74,6 +74,7 @@ function App() {
       await axios.delete(`http://localhost:8000/user/${userId}/note/${noteId}`, { withCredentials: true });
       const updatedNotes = notes.filter((note) => note._id !== noteId);
       setNotes(updatedNotes);
+      fetchNotes(userId);
     } catch (error) {
       console.error("Error deleting note:", error);
     }
@@ -83,6 +84,7 @@ function App() {
     try {
       const response = await axios.patch(`http://localhost:8000/user/${userId}/note/${noteId}`, updatedNote, { withCredentials: true });
       setNotes(response.data);
+      fetchNotes(userId);
     } catch (error) {
       console.error("Error updating note:", error);
     }
